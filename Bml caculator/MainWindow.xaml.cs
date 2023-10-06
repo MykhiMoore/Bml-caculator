@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -12,23 +13,35 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Xaml.
+using System.Xml.Serialization;
 
 namespace Bml_caculator
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
+    [XmlRoot ("BMI Calc", Namespace = "www.bmicalc.ninja")]
     public partial class MainWindow : Window
     {
+        public string Filepath = "C:/Temp/";
+        public string FileName = "yourBMI.xml";
+
+    
     internal class Customer
         {
+            [XmlAttribute("Last Name")]
             public string LastName { get; set; }
+            [XmlAttribute("First Name")]
             public string FirstName { get; set; }
+            [XmlAttribute("Phone Name")]
             public string PhoneNumber { get; set; }
+            [XmlAttribute("Height")]
             public int heightInches { get; set; }
+            [XmlAttribute("Weight")]
             public int weightLbs { get; set; }
-            public int custBMI { get; set; }
+            [XmlAttribute("Customer BMI")]
+            public int customerBMI { get; set; }
+            [XmlAttribute("status")]
             public string statusTitle { get; set; }
         }
         public MainWindow()
@@ -68,7 +81,7 @@ namespace Bml_caculator
 
             int bmi;
             bmi = 703 * customer1.weightLbs / (customer1.heightInches * customer1.heightInches);
-            customer1.custBMI = bmi;
+            customer1.customerBMI = bmi;
 
             string yourBMIstatus = "NA";
             customer1.statusTitle = yourBMIstatus;
@@ -78,28 +91,35 @@ namespace Bml_caculator
           
             if (bmi < 18.5)
             {
-                Console.WriteLine("According to CDC.gov BMI Calculator you are underweight.");
+                Console.WriteLine("According to CDC.gov BMI Calculator \nyou are underweight.");
                 customer1.statusTitle = "Underweight";
             }
             else if (bmi < 24.9)
             {
-                Console.WriteLine("According to CDC.gov BMI Calculator you have a normal body weight.");
+                Console.WriteLine("According to CDC.gov BMI Calculator \nyou have a normal body weight.");
                 customer1.statusTitle = "Normal";
             }
             else if (bmi < 29.9)
             {
-                Console.WriteLine("According to CDC.gov BMI Calculator you are overweight.");
+                Console.WriteLine("According to CDC.gov BMI Calculator \nyou are overweight.");
                 customer1.statusTitle = "Overweight";
             }
             else
             {
-                Console.WriteLine("According to CDC.gov BMI Calculator you are obese.");
+                Console.WriteLine("According to CDC.gov BMI Calculator \nyou are obese.");
                 customer1.statusTitle = "Obese";
             }
-            xYourBMIResults.Text = customer1.custBMI.ToString();
+            xYourBMIResults.Text = customer1.customerBMI.ToString();
+            xBMIMessage.Text = yourBMIstatus;
 
-            //still on final challange
+
+            TextWriter writer = new StreamWriter(Filepath + FileName);
+            XmlSerializer ser = new XmlSerializer(typeof(Customer));
+
+            ser.Serialize(writer, customer1);
+            writer.Close();
 
         }
     }
 }
+  ///still on pt3
