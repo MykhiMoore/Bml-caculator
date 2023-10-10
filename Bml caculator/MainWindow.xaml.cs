@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -13,6 +14,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace Bml_caculator
@@ -23,7 +25,7 @@ namespace Bml_caculator
     [XmlRoot ("BMI Calc", Namespace = "www.bmicalc.ninja")]
     public partial class MainWindow : Window
     {
-        public string Filepath = "C:/Temp/";
+        public string Filepath = "C:\\Users\\Moore_My'Khi\\source\\repos\\Bml caculator\\Bml caculator\\";
         public string FileName = "yourBMI.xml";
 
     
@@ -88,7 +90,7 @@ namespace Bml_caculator
 
             MessageBox.Show($"The Customer's name is {customer1.FirstName} {customer1.LastName} and they can be reached at {customer1.PhoneNumber}. They are {customer1.heightInches} inches tall. Their weight is {customer1.weightLbs} Their BMI is {bmi}");
 
-          
+
             if (bmi < 18.5)
             {
                 Console.WriteLine("According to CDC.gov BMI Calculator \nyou are underweight.");
@@ -112,14 +114,33 @@ namespace Bml_caculator
             xYourBMIResults.Text = customer1.customerBMI.ToString();
             xBMIMessage.Text = yourBMIstatus;
 
-
             TextWriter writer = new StreamWriter(Filepath + FileName);
             XmlSerializer ser = new XmlSerializer(typeof(Customer));
-
             ser.Serialize(writer, customer1);
             writer.Close();
 
+
+        }
+
+        private void OnLoadStats() 
+        {
+            Customer cust = new Customer();
+            
+            XmlSerializer des = new XmlSerializer(typeof(Customer));
+            using (XmlReader reader = XmlReader.Create(Filepath + FileName)) 
+            {
+                cust = (Customer) des.Deserialize(reader);
+
+
+
+                xLastNameBox.Text = cust.LastName;
+                xFirstNameBox.Text = cust.FirstName;
+                xPhoneBox.Text = cust.PhoneNumber;
+            }
+
+            DataSet xmlData = new DataSet();
+            xmlData.ReadXml(Filepath + FileName, XmlReadMode.Auto);
+            xDataGrid.ItemsSource = xmlData.Tables[0].DefaultView;
         }
     }
-}
-  ///still on pt3 (4)
+}//still stuck on temp 
