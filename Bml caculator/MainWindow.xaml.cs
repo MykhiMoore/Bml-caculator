@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlTypes;
 using System.IO;
 using System.Linq;
+using System.Runtime.ConstrainedExecution;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -25,11 +28,10 @@ namespace Bml_caculator
     [XmlRoot ("BMI Calc", Namespace = "www.bmicalc.ninja")]
     public partial class MainWindow : Window
     {
-        public string Filepath = "C:\\Users\\Moore_My'Khi\\source\\repos\\Bml caculator\\Bml caculator\\";
+        public string FilePath = "C:\\Users\\mykhi\\source\\repos\\Bml-caculator\\Bml caculator";
         public string FileName = "yourBMI.xml";
+        public class Customer
 
-    
-    internal class Customer
         {
             [XmlAttribute("Last Name")]
             public string LastName { get; set; }
@@ -66,7 +68,7 @@ namespace Bml_caculator
 
         }
 
-        private void SubmitBtn_Click(object sender, RoutedEventArgs e)
+       private void SubmitBtn_Click(object sender, RoutedEventArgs e)
         {
             Customer customer1 = new Customer();
 
@@ -91,31 +93,35 @@ namespace Bml_caculator
             MessageBox.Show($"The Customer's name is {customer1.FirstName} {customer1.LastName} and they can be reached at {customer1.PhoneNumber}. They are {customer1.heightInches} inches tall. Their weight is {customer1.weightLbs} Their BMI is {bmi}");
 
 
-            if (bmi < 18.5)
+            if (customer1.customerBMI < 18.5)
             {
-                Console.WriteLine("According to CDC.gov BMI Calculator \nyou are underweight.");
+                xBMIMessage.Text = "According to CDC.gov BMI Calculator you are underweight.";
                 customer1.statusTitle = "Underweight";
             }
-            else if (bmi < 24.9)
+            else if (customer1.customerBMI < 24.9)
             {
-                Console.WriteLine("According to CDC.gov BMI Calculator \nyou have a normal body weight.");
+                xBMIMessage.Text = "According to CDC.gov BMI Calculator you have a normal body weight.";
                 customer1.statusTitle = "Normal";
             }
-            else if (bmi < 29.9)
+            else if (customer1.customerBMI < 29.9)
             {
-                Console.WriteLine("According to CDC.gov BMI Calculator \nyou are overweight.");
+                xBMIMessage.Text = "According to CDC.gov BMI Calculator you are overweight.";
                 customer1.statusTitle = "Overweight";
             }
             else
             {
-                Console.WriteLine("According to CDC.gov BMI Calculator \nyou are obese.");
+                xBMIMessage.Text = "According to CDC.gov BMI Calculator you are obese.";
                 customer1.statusTitle = "Obese";
+
             }
+            MessageBox.Show($"BMI: {customer1.customerBMI}\nStatus: {customer1.statusTitle}");
+
             xYourBMIResults.Text = customer1.customerBMI.ToString();
             xBMIMessage.Text = yourBMIstatus;
 
-            TextWriter writer = new StreamWriter(Filepath + FileName);
+            TextWriter writer = new StreamWriter(FilePath + FileName);
             XmlSerializer ser = new XmlSerializer(typeof(Customer));
+
             ser.Serialize(writer, customer1);
             writer.Close();
 
@@ -127,7 +133,7 @@ namespace Bml_caculator
             Customer cust = new Customer();
             
             XmlSerializer des = new XmlSerializer(typeof(Customer));
-            using (XmlReader reader = XmlReader.Create(Filepath + FileName)) 
+            using (XmlReader reader = XmlReader.Create(FilePath+FileName)) 
             {
                 cust = (Customer) des.Deserialize(reader);
 
@@ -139,8 +145,8 @@ namespace Bml_caculator
             }
 
             DataSet xmlData = new DataSet();
-            xmlData.ReadXml(Filepath + FileName, XmlReadMode.Auto);
+            xmlData.ReadXml(FilePath + FileName, XmlReadMode.Auto);
             xDataGrid.ItemsSource = xmlData.Tables[0].DefaultView;
         }
     }
-}//still stuck on temp 
+}
